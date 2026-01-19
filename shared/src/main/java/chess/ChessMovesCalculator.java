@@ -22,45 +22,92 @@ public class ChessMovesCalculator {
         PieceType moveType = board.getPiece(currentPosition).getPieceType();
         switch(moveType) {
             case PieceType.KING:
-                break;
+                return moveKing(board, currentPosition);
             case PieceType.QUEEN:
-                break;
+                return moveQueen(board, currentPosition);
             case PieceType.BISHOP:
-                break;
+                return moveBishop(board, currentPosition);
             case PieceType.KNIGHT:
-                break;
+                return moveKnight(board, currentPosition);
             case PieceType.ROOK:
-                break;
+                return moveRook(board, currentPosition);
             case PieceType.PAWN:
-                break;
+                return movePawn(board, currentPosition);
         }
         throw new RuntimeException("Provided piece type not recognized.");
     }
 
+    /**
+     * @return Possible moves if the given piece is a King.
+     */
     public static Collection<ChessMove> moveKing(ChessBoard board, ChessPosition currentPosition) {
         throw new RuntimeException("Not implemented");
     }
 
+    /**
+     * @return Possible moves if the given piece is a Queen.
+     */
     public static Collection<ChessMove> moveQueen(ChessBoard board, ChessPosition currentPosition) {
         throw new RuntimeException("Not implemented");
     }
 
+    /**
+     * @return Possible moves if the given piece is a Bishop.
+     */
     public static Collection<ChessMove> moveBishop(ChessBoard board, ChessPosition currentPosition) {
         throw new RuntimeException("Not implemented");
     }
 
+    /**
+     * @return Possible moves if the given piece is a Knight.
+     */
     public static Collection<ChessMove> moveKnight(ChessBoard board, ChessPosition currentPosition) {
         throw new RuntimeException("Not implemented");
     }
 
+    /**
+     * @return Possible moves if the given piece is a Rook.
+     */
     public static Collection<ChessMove> moveRook(ChessBoard board, ChessPosition currentPosition) {
         throw new RuntimeException("Not implemented");
     }
 
-    public static boolean squareValid(ChessPosition position) {
+    /**
+     * @return Possible moves if the given piece is a Pawn.
+     */
+    public static Collection<ChessMove> movePawn(ChessBoard board, ChessPosition currentPosition) {
         throw new RuntimeException("Not implemented");
     }
 
+
+    /**
+     * @return Is the provided square valid as a position to move to.
+     * Checks if the position is in bounds and unoccupied,
+     * or in bounds and occupied by an enemy piece.
+     */
+    public static boolean isSquareValid(ChessBoard board, ChessPosition position, ChessGame.TeamColor attackerColor) {
+        //Check if in bounds
+        if(!isSquareInBounds(position)) {
+            return false;
+        }
+
+        ChessPiece occupyingPiece = board.getPiece(position);
+        //Check if space is unoccupied.
+        if(occupyingPiece == null){
+            return true;
+        }
+        //Check if occupying piece is enemy piece
+        if(occupyingPiece.getTeamColor() != attackerColor) {
+            return true;
+        }
+
+        //Position is occupied by a friendly piece.
+        return false;
+    }
+
+    /**
+     * @return Is the provided chess square in the bounds of the board.
+     */
     public static boolean isSquareInBounds(ChessPosition position) {
         if(position.getRow() < 1) {
             return false;
