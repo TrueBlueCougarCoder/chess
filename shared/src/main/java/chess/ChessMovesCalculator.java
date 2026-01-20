@@ -48,7 +48,14 @@ public class ChessMovesCalculator {
      * @return Possible moves if the given piece is a Queen.
      */
     public static Collection<ChessMove> moveQueen(ChessBoard board, ChessPosition currentPosition) {
-        throw new RuntimeException("Not implemented");
+        Collection<ChessMove> allPossibleMoves = new ArrayList<ChessMove>();
+
+        //Adding Diagonal Moves
+        allPossibleMoves.addAll(moveBishop(board,currentPosition));
+        //Adding Straight Lines
+        allPossibleMoves.addAll(moveRook(board,currentPosition));
+
+        return allPossibleMoves;
     }
 
     /**
