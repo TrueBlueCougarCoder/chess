@@ -120,9 +120,10 @@ public class ChessMovesCalculator {
      * @return Possible moves if the given piece is a Pawn.
      */
     public static Collection<ChessMove> movePawn(ChessBoard board, ChessPosition currentPosition) {
-        Collection<ChessMove> allPossibleMoves = new ArrayList<ChessMove>();
+        ArrayList<ChessMove> allPossibleMoves = new ArrayList<ChessMove>();
         ChessPiece piece = board.getPiece(currentPosition);
-        PieceType promotion = null;
+        int currentRow = currentPosition.getRow();
+        int currentCol = currentPosition.getColumn();
 
         //Defining direction of movement based on color.
         int direction = 1;
@@ -130,33 +131,52 @@ public class ChessMovesCalculator {
             direction = -1;
         }
 
+        //Mark possible promotions.
+        PieceType[] promotionTypeList = {null};
+        if((currentRow + direction == 1) || (currentRow + direction == 8)) {
+            promotionTypeList = new PieceType[]{PieceType.QUEEN, PieceType.BISHOP, PieceType.KNIGHT, PieceType.ROOK};
+        }
+
         //Move Forward 1 space
-        ChessPosition possibleMove = new ChessPosition(currentPosition.getRow() + direction, currentPosition.getColumn());
+        ChessPosition possibleMove = new ChessPosition(currentRow + direction, currentCol);
         if(isSquareOpen(board, possibleMove)) {
-            allPossibleMoves.add(new ChessMove(currentPosition, possibleMove, promotion));
+            //allPossibleMoves.add(new ChessMove(currentPosition, possibleMove, promotion));
+            addPossiblePawnMoves(currentPosition, possibleMove, promotionTypeList, allPossibleMoves);
 
             //Move Forward 2 spaces
-            int currentRow = currentPosition.getRow();
             if((currentRow == 2) || (currentRow == 7)) {
-                possibleMove = new ChessPosition(currentPosition.getRow() + (2 * direction), currentPosition.getColumn());
+                possibleMove = new ChessPosition(currentRow + (2 * direction), currentCol);
                 if (isSquareInBounds(possibleMove) && isSquareOpen(board, possibleMove)) {
-                    allPossibleMoves.add(new ChessMove(currentPosition, possibleMove, promotion));
+                    //allPossibleMoves.add(new ChessMove(currentPosition, possibleMove, promotion));
+                    addPossiblePawnMoves(currentPosition, possibleMove, promotionTypeList, allPossibleMoves);
                 }
             }
         }
 
 
         //Move diagonals
-        possibleMove = new ChessPosition(currentPosition.getRow() + direction, currentPosition.getColumn()+1);
-        if(isSquareValidPawn(board, possibleMove, piece.getTeamColor())) {
-            allPossibleMoves.add(new ChessMove(currentPosition, possibleMove, promotion));
+        possibleMove = new ChessPosition(currentRow + direction, currentCol+1);
+        if(canPawnCapture(board, possibleMove, piece.getTeamColor())) {
+            //allPossibleMoves.add(new ChessMove(currentPosition, possibleMove, promotion));
+            addPossiblePawnMoves(currentPosition, possibleMove, promotionTypeList, allPossibleMoves);
         }
-        possibleMove = new ChessPosition(currentPosition.getRow() + direction, currentPosition.getColumn()-1);
-        if(isSquareValidPawn(board, possibleMove, piece.getTeamColor())) {
-            allPossibleMoves.add(new ChessMove(currentPosition, possibleMove, promotion));
+        possibleMove = new ChessPosition(currentRow + direction, currentCol-1);
+        if(canPawnCapture(board, possibleMove, piece.getTeamColor())) {
+            //allPossibleMoves.add(new ChessMove(currentPosition, possibleMove, promotion));
+            addPossiblePawnMoves(currentPosition, possibleMove, promotionTypeList, allPossibleMoves);
         }
 
         return allPossibleMoves;
+    }
+
+    /**
+     * Helper method containing the promotion for loop needed by the movePawn
+     * method since it can have a promotion type other than null.
+     */
+    public static void addPossiblePawnMoves(ChessPosition currentPosition, ChessPosition possibleMove, PieceType[] promotionTypeList, ArrayList<ChessMove> moveList) {
+        for (PieceType promotion : promotionTypeList) {
+            moveList.add(new ChessMove(currentPosition, possibleMove, promotion));
+        }
     }
 
 
@@ -190,12 +210,12 @@ public class ChessMovesCalculator {
     }
 
     /**
-     * @return Is the provided square valid as a position to move to.
-     * Checks if the position is in bounds and unoccupied,
-     * or in bounds and occupied by an enemy piece.
-     * Is ONLY used for PAWN attacks.
+     * @return Is the provided square valid as a position to move to via capture.
+     * <p>
+     * Checks if the position is in bounds and unoccupied, or in bounds and
+     * occupied by an enemy piece.  Is ONLY used for PAWN attacks.
      */
-    public static boolean isSquareValidPawn(ChessBoard board, ChessPosition position, TeamColor attackerColor) {
+    public static boolean canPawnCapture(ChessBoard board, ChessPosition position, TeamColor attackerColor) {
         //Check if in bounds
         if(!isSquareInBounds(position)) {
             return false;
