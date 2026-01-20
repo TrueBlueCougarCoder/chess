@@ -76,7 +76,33 @@ public class ChessMovesCalculator {
      * @return Possible moves if the given piece is a Pawn.
      */
     public static Collection<ChessMove> movePawn(ChessBoard board, ChessPosition currentPosition) {
-        throw new RuntimeException("Not implemented");
+        Collection<ChessMove> allPossibleMoves = new ArrayList<ChessMove>();
+        ChessPiece piece = board.getPiece(currentPosition);
+        PieceType promotion = null;
+
+        //Defining direction of movement based on color.
+        int direction = 1;
+        if(piece.getTeamColor() == ChessGame.TeamColor.BLACK){
+            direction = -1;
+        }
+
+        //Move Forward
+        ChessPosition possibleMove = new ChessPosition(currentPosition.getRow() + direction, currentPosition.getColumn());
+        if(isSquareOpen(board, possibleMove)) {
+            allPossibleMoves.add(new ChessMove(currentPosition, possibleMove, promotion));
+        }
+
+        //Move diagonals
+        possibleMove = new ChessPosition(currentPosition.getRow() + direction, currentPosition.getColumn()+1);
+        if(isSquareValidPawn(board, possibleMove, piece.getTeamColor())) {
+            allPossibleMoves.add(new ChessMove(currentPosition, possibleMove, promotion));
+        }
+        possibleMove = new ChessPosition(currentPosition.getRow() + direction, currentPosition.getColumn()-1);
+        if(isSquareValidPawn(board, possibleMove, piece.getTeamColor())) {
+            allPossibleMoves.add(new ChessMove(currentPosition, possibleMove, promotion));
+        }
+
+        return allPossibleMoves;
     }
 
 
@@ -84,26 +110,48 @@ public class ChessMovesCalculator {
      * @return Is the provided square valid as a position to move to.
      * Checks if the position is in bounds and unoccupied,
      * or in bounds and occupied by an enemy piece.
+     * Is NEVER used for PAWNs.
      */
     public static boolean isSquareValid(ChessBoard board, ChessPosition position, ChessGame.TeamColor attackerColor) {
         //Check if in bounds
         if(!isSquareInBounds(position)) {
             return false;
         }
-
-        ChessPiece occupyingPiece = board.getPiece(position);
         //Check if space is unoccupied.
-        if(occupyingPiece == null){
+        if(isSquareOpen(board, position)){
             return true;
         }
         //Check if occupying piece is enemy piece
-        if(occupyingPiece.getTeamColor() != attackerColor) {
+        if(isEnemyPosition(board, position, attackerColor)) {
             return true;
         }
-
         //Position is occupied by a friendly piece.
         return false;
     }
+
+    /**
+     * @return Is the provided square valid as a position to move to.
+     * Checks if the position is in bounds and unoccupied,
+     * or in bounds and occupied by an enemy piece.
+     * Is ONLY used for PAWN attacks.
+     */
+    public static boolean isSquareValidPawn(ChessBoard board, ChessPosition position, ChessGame.TeamColor attackerColor) {
+        //Check if in bounds
+        if(!isSquareInBounds(position)) {
+            return false;
+        }
+        //Check if space is unoccupied.
+        if(isSquareOpen(board, position)){
+            return false;
+        }
+        //Check if occupying piece is enemy piece
+        if(isEnemyPosition(board, position, attackerColor)) {
+            return true;
+        }
+        //Position is occupied by a friendly piece.
+        return false;
+    }
+
 
     /**
      * @return Is the provided chess square in the bounds of the board.
@@ -116,6 +164,26 @@ public class ChessMovesCalculator {
         } else if(position.getColumn() < 1) {
             return false;
         } else if(position.getColumn() > 8) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * @return Is the provided chess square empty.
+     */
+    public static boolean isSquareOpen(ChessBoard board, ChessPosition position) {
+        if(board.getPiece(position) == null) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @return Is the provided chess square occupied by an enemy piece.
+     */
+    public static boolean isEnemyPosition(ChessBoard board, ChessPosition position, ChessGame.TeamColor attackerColor) {
+        if(board.getPiece(position).getTeamColor() == attackerColor) {
             return false;
         }
         return true;
