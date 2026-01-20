@@ -53,4 +53,11 @@ public class ChessPosition {
         return (this.row == position.getRow() &&
                 this.col == position.getColumn());
     }
+
+    @Override
+    public int hashCode() {
+        int hash = row;
+        hash = 31 * hash + col;
+        return hash;
+    }
 }

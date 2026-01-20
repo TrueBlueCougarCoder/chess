@@ -1,6 +1,7 @@
 package chess;
 import chess.ChessPiece.PieceType;
 import chess.ChessGame.TeamColor;
+import java.util.Objects;
 
 /**
  * A chessboard that can hold and rearrange chess pieces.
@@ -54,8 +55,8 @@ public class ChessBoard {
             whitePiece = new ChessPiece(TeamColor.WHITE, pieceTypes[i]);
             blackPiece = new ChessPiece(TeamColor.BLACK, pieceTypes[i]);
             for(int position : positionSet) {
-                squares[1][position] = whitePiece;
-                squares[6][position] = blackPiece;
+                squares[0][position] = whitePiece;
+                squares[7][position] = blackPiece;
             }
         }
 
@@ -69,6 +70,41 @@ public class ChessBoard {
     }
 
     @Override
+    public String toString() {
+        String output = "";
+        for(int i = 7; i >= 0; i--) {
+            for(int j = 0; j <=7; j++) {
+                ChessPiece piece = squares[i][j];
+                if(piece == null) {
+                    output += " ";
+                } else {
+                    String pieceChar;
+                    if(piece.getPieceType() == PieceType.KING) {
+                        pieceChar = "K";
+                    } else if(piece.getPieceType() == PieceType.QUEEN) {
+                        pieceChar = "Q";
+                    } else if(piece.getPieceType() == PieceType.BISHOP) {
+                        pieceChar = "B";
+                    } else if(piece.getPieceType() == PieceType.KNIGHT) {
+                        pieceChar = "N";
+                    } else if(piece.getPieceType() == PieceType.ROOK) {
+                        pieceChar = "R";
+                    } else {
+                        pieceChar = "P";
+                    }
+                    if(piece.getTeamColor() == TeamColor.BLACK) {
+                        pieceChar.toLowerCase();
+                    }
+                    output += pieceChar;
+                }
+                output += "|";
+            }
+            output = output.substring(0,output.length()-1);
+            output += "\n";
+        }
+        return output;
+    }
+
     public boolean equals(Object obj) {
         if(obj == null) {
             return false;
@@ -99,5 +135,15 @@ public class ChessBoard {
             }
         }
         return true;
+    }
+
+    public int hashCode() {
+        int hash = 0;
+        for(int i = 0; i <= 7; i++) {
+            for(int j = 0; j <= 7; j ++) {
+                hash = 31 * hash + Objects.hashCode(squares[i][j]);
+            }
+        }
+        return hash;
     }
 }

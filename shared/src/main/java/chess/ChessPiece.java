@@ -1,7 +1,6 @@
 package chess;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Represents a single chess piece
@@ -62,6 +61,12 @@ public class ChessPiece {
     }
 
     @Override
+    public int hashCode() {
+        int hash = pieceColor.hashCode();
+        hash = 31 * hash + type.hashCode();
+        return hash;
+    }
+
     public boolean equals(Object obj) {
         if(obj == null) {
             return false;
