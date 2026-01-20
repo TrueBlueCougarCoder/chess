@@ -55,7 +55,24 @@ public class ChessMovesCalculator {
      * @return Possible moves if the given piece is a Bishop.
      */
     public static Collection<ChessMove> moveBishop(ChessBoard board, ChessPosition currentPosition) {
-        throw new RuntimeException("Not implemented");
+        Collection<ChessMove> allPossibleMoves = new ArrayList<ChessMove>();
+        //Moves Up-Left
+        int[] modifier = {1,-1};
+        allPossibleMoves.addAll(validMovesLine(board,currentPosition,modifier));
+
+        //Moves Up-Right
+        modifier[1] = 1;
+        allPossibleMoves.addAll(validMovesLine(board,currentPosition,modifier));
+
+        //Moves Down-Right
+        modifier[0] = -1;
+        allPossibleMoves.addAll(validMovesLine(board,currentPosition,modifier));
+
+        //Moves Down-Left
+        modifier[1] = -1;
+        allPossibleMoves.addAll(validMovesLine(board,currentPosition,modifier));
+
+        return allPossibleMoves;
     }
 
     /**
