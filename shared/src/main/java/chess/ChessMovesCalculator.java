@@ -41,7 +41,8 @@ public class ChessMovesCalculator {
      * @return Possible moves if the given piece is a King.
      */
     public static Collection<ChessMove> moveKing(ChessBoard board, ChessPosition currentPosition) {
-        throw new RuntimeException("Not implemented");
+        int[][]relativePositions = {{-1,-1},{-1,0},{-1,1},{0,-1},{0,1},{1,-1},{1,0},{1,1}};
+        return validMovesSpecificPoints(board, currentPosition, relativePositions);
     }
 
     /**
@@ -86,7 +87,8 @@ public class ChessMovesCalculator {
      * @return Possible moves if the given piece is a Knight.
      */
     public static Collection<ChessMove> moveKnight(ChessBoard board, ChessPosition currentPosition) {
-        throw new RuntimeException("Not implemented");
+        int[][]relativePositions = {{-1,-2},{-2,-1},{-2,1},{-1,2},{1,-2},{2,-1},{2,1},{1,2}};
+        return validMovesSpecificPoints(board, currentPosition, relativePositions);
     }
 
     /**
@@ -238,7 +240,9 @@ public class ChessMovesCalculator {
     }
 
     /**
-     * @return Validates chess positions along a line based on a given modifier (both straight and diagonal).
+     * @return Valid chess positions along a line based on a given modifier (both straight and diagonal).
+     * <p>
+     * Used by moveBishop() and moveKnight().
      */
     public static ArrayList<ChessMove> validMovesLine(ChessBoard board, ChessPosition currentPosition, int[]modifier) {
         ChessGame.TeamColor pieceColor = board.getPiece(currentPosition).getTeamColor();
@@ -259,5 +263,28 @@ public class ChessMovesCalculator {
         }while(positionValid == null);
 
         return possibleMoves;
+    }
+
+    /**
+     * @return Valid chess positions after given a list of locations to check.
+     * <p>
+     * Used by moveKing() and moveKinght()
+     */
+    public static ArrayList<ChessMove> validMovesSpecificPoints(ChessBoard board, ChessPosition currentPosition, int[][] relativePositions) {
+        ArrayList<ChessMove> allPossibleMoves = new ArrayList<ChessMove>();
+        ChessGame.TeamColor pieceColor = board.getPiece(currentPosition).getTeamColor();
+        int currentRow = currentPosition.getRow();
+        int currentColumn = currentPosition.getColumn();
+
+        for(int i = 0; i < relativePositions.length; i++) {
+            int nextRow = currentRow + relativePositions[i][0];
+            int nextCol = currentColumn + relativePositions[i][1];
+            ChessPosition nextPosition = new ChessPosition(nextRow,nextCol);
+            ChessGame.TeamColor nextStatus = isSquareValid(board,nextPosition,pieceColor);
+            if(nextStatus != pieceColor) {
+                allPossibleMoves.add(new ChessMove(currentPosition, nextPosition, null));
+            }
+        }
+        return allPossibleMoves;
     }
 }
