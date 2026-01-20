@@ -47,4 +47,23 @@ public class ChessMove {
     public String toString() {
         return String.format("%s%s", startPosition, endPosition);
     }
+
+    public boolean equals(Object obj) {
+        if(obj == null) {
+            return false;
+        }
+
+        if(obj == this) {
+            return true;
+        }
+
+        if(obj.getClass() != this.getClass()) {
+            return false;
+        }
+
+        ChessMove move = (ChessMove)obj;
+        return (this.startPosition.equals(move.startPosition) &&
+                this.endPosition.equals(move.endPosition) &&
+                this.promotionPiece == move.promotionPiece);
+    }
 }

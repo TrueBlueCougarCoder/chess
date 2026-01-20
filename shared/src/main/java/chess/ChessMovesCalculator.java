@@ -69,7 +69,25 @@ public class ChessMovesCalculator {
      * @return Possible moves if the given piece is a Rook.
      */
     public static Collection<ChessMove> moveRook(ChessBoard board, ChessPosition currentPosition) {
-        throw new RuntimeException("Not implemented");
+        Collection<ChessMove> allPossibleMoves = new ArrayList<ChessMove>();
+        //Moves Up
+        int[] modifier = {1,0};
+        allPossibleMoves.addAll(validMovesLine(board,currentPosition,modifier));
+
+        //Moves Down
+        modifier[0] = -1;
+        allPossibleMoves.addAll(validMovesLine(board,currentPosition,modifier));
+
+        //Moves Right
+        modifier[0] = 0;
+        modifier[1] = 1;
+        allPossibleMoves.addAll(validMovesLine(board,currentPosition,modifier));
+
+        //Moves Left
+        modifier[1] = -1;
+        allPossibleMoves.addAll(validMovesLine(board,currentPosition,modifier));
+
+        return allPossibleMoves;
     }
 
     /**
@@ -111,22 +129,28 @@ public class ChessMovesCalculator {
      * Checks if the position is in bounds and unoccupied,
      * or in bounds and occupied by an enemy piece.
      * Is NEVER used for PAWNs.
+     * <p>
+     * Return meanings: null = square is empty
+     *                  own team color = out of bounds OR space has a friendly piece
+     *                  opponent team color = occupied by an opponent's piece
      */
-    public static boolean isSquareValid(ChessBoard board, ChessPosition position, ChessGame.TeamColor attackerColor) {
+    public static ChessGame.TeamColor isSquareValid(ChessBoard board, ChessPosition position, ChessGame.TeamColor attackerColor) {
         //Check if in bounds
         if(!isSquareInBounds(position)) {
-            return false;
+            return attackerColor;
         }
         //Check if space is unoccupied.
         if(isSquareOpen(board, position)){
-            return true;
+            return null;
         }
+
         //Check if occupying piece is enemy piece
         if(isEnemyPosition(board, position, attackerColor)) {
-            return true;
+            ChessGame.TeamColor enemyColor = board.getPiece(position).getTeamColor();
+            return enemyColor;
         }
         //Position is occupied by a friendly piece.
-        return false;
+        return attackerColor;
     }
 
     /**
@@ -187,5 +211,29 @@ public class ChessMovesCalculator {
             return false;
         }
         return true;
+    }
+
+    /**
+     * @return Validates chess positions along a line based on a given modifier (both straight and diagonal).
+     */
+    public static ArrayList<ChessMove> validMovesLine(ChessBoard board, ChessPosition currentPosition, int[]modifier) {
+        ChessGame.TeamColor pieceColor = board.getPiece(currentPosition).getTeamColor();
+        ArrayList<ChessMove> possibleMoves = new ArrayList<ChessMove>();
+
+        ChessGame.TeamColor positionValid;
+        int nextRow = currentPosition.getRow();
+        int nextCol = currentPosition.getColumn();
+        do {
+            nextRow += modifier[0];
+            nextCol += modifier[1];
+            ChessPosition nextPosition = new ChessPosition(nextRow, nextCol);
+
+            positionValid = isSquareValid(board, nextPosition, pieceColor);
+            if(positionValid != pieceColor) {
+                possibleMoves.add(new ChessMove(currentPosition, nextPosition, null));
+            }
+        }while(positionValid == null);
+
+        return possibleMoves;
     }
 }

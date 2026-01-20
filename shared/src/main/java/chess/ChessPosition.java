@@ -35,4 +35,22 @@ public class ChessPosition {
     public String toString() {
         return String.format("[%d,%d]", row, col);
     }
+
+    public boolean equals(Object obj) {
+        if(obj == null) {
+            return false;
+        }
+
+        if(obj == this) {
+            return true;
+        }
+
+        if(obj.getClass() != this.getClass()) {
+            return false;
+        }
+
+        ChessPosition position = (ChessPosition)obj;
+        return (this.row == position.getRow() &&
+                this.col == position.getColumn());
+    }
 }
