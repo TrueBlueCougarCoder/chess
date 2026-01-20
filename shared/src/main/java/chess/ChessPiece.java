@@ -60,4 +60,23 @@ public class ChessPiece {
         //return List.of();
         return ChessMovesCalculator.pieceMoves(board, myPosition);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == null) {
+            return false;
+        }
+
+        if(obj == this) {
+            return true;
+        }
+
+        if(obj.getClass() != this.getClass()) {
+            return false;
+        }
+
+        ChessPiece objPiece = (ChessPiece)obj;
+        return (this.pieceColor == objPiece.getTeamColor() &&
+                this.type == objPiece.getPieceType());
+    }
 }

@@ -1,9 +1,9 @@
 package chess;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.ArrayList;
 import chess.ChessPiece.PieceType;
+import chess.ChessGame.TeamColor;
 
 /**
  * Identifies all possible moves for a piece.
@@ -126,15 +126,25 @@ public class ChessMovesCalculator {
 
         //Defining direction of movement based on color.
         int direction = 1;
-        if(piece.getTeamColor() == ChessGame.TeamColor.BLACK){
+        if(piece.getTeamColor() == TeamColor.BLACK){
             direction = -1;
         }
 
-        //Move Forward
+        //Move Forward 1 space
         ChessPosition possibleMove = new ChessPosition(currentPosition.getRow() + direction, currentPosition.getColumn());
         if(isSquareOpen(board, possibleMove)) {
             allPossibleMoves.add(new ChessMove(currentPosition, possibleMove, promotion));
+
+            //Move Forward 2 spaces
+            int currentRow = currentPosition.getRow();
+            if((currentRow == 2) || (currentRow == 7)) {
+                possibleMove = new ChessPosition(currentPosition.getRow() + (2 * direction), currentPosition.getColumn());
+                if (isSquareInBounds(possibleMove) && isSquareOpen(board, possibleMove)) {
+                    allPossibleMoves.add(new ChessMove(currentPosition, possibleMove, promotion));
+                }
+            }
         }
+
 
         //Move diagonals
         possibleMove = new ChessPosition(currentPosition.getRow() + direction, currentPosition.getColumn()+1);
@@ -160,7 +170,7 @@ public class ChessMovesCalculator {
      *                  own team color = out of bounds OR space has a friendly piece
      *                  opponent team color = occupied by an opponent's piece
      */
-    public static ChessGame.TeamColor isSquareValid(ChessBoard board, ChessPosition position, ChessGame.TeamColor attackerColor) {
+    public static TeamColor isSquareValid(ChessBoard board, ChessPosition position, TeamColor attackerColor) {
         //Check if in bounds
         if(!isSquareInBounds(position)) {
             return attackerColor;
@@ -172,7 +182,7 @@ public class ChessMovesCalculator {
 
         //Check if occupying piece is enemy piece
         if(isEnemyPosition(board, position, attackerColor)) {
-            ChessGame.TeamColor enemyColor = board.getPiece(position).getTeamColor();
+            TeamColor enemyColor = board.getPiece(position).getTeamColor();
             return enemyColor;
         }
         //Position is occupied by a friendly piece.
@@ -185,7 +195,7 @@ public class ChessMovesCalculator {
      * or in bounds and occupied by an enemy piece.
      * Is ONLY used for PAWN attacks.
      */
-    public static boolean isSquareValidPawn(ChessBoard board, ChessPosition position, ChessGame.TeamColor attackerColor) {
+    public static boolean isSquareValidPawn(ChessBoard board, ChessPosition position, TeamColor attackerColor) {
         //Check if in bounds
         if(!isSquareInBounds(position)) {
             return false;
@@ -232,7 +242,7 @@ public class ChessMovesCalculator {
     /**
      * @return Is the provided chess square occupied by an enemy piece.
      */
-    public static boolean isEnemyPosition(ChessBoard board, ChessPosition position, ChessGame.TeamColor attackerColor) {
+    public static boolean isEnemyPosition(ChessBoard board, ChessPosition position, TeamColor attackerColor) {
         if(board.getPiece(position).getTeamColor() == attackerColor) {
             return false;
         }
@@ -245,10 +255,10 @@ public class ChessMovesCalculator {
      * Used by moveBishop() and moveKnight().
      */
     public static ArrayList<ChessMove> validMovesLine(ChessBoard board, ChessPosition currentPosition, int[]modifier) {
-        ChessGame.TeamColor pieceColor = board.getPiece(currentPosition).getTeamColor();
+        TeamColor pieceColor = board.getPiece(currentPosition).getTeamColor();
         ArrayList<ChessMove> possibleMoves = new ArrayList<ChessMove>();
 
-        ChessGame.TeamColor positionValid;
+        TeamColor positionValid;
         int nextRow = currentPosition.getRow();
         int nextCol = currentPosition.getColumn();
         do {
@@ -272,7 +282,7 @@ public class ChessMovesCalculator {
      */
     public static ArrayList<ChessMove> validMovesSpecificPoints(ChessBoard board, ChessPosition currentPosition, int[][] relativePositions) {
         ArrayList<ChessMove> allPossibleMoves = new ArrayList<ChessMove>();
-        ChessGame.TeamColor pieceColor = board.getPiece(currentPosition).getTeamColor();
+        TeamColor pieceColor = board.getPiece(currentPosition).getTeamColor();
         int currentRow = currentPosition.getRow();
         int currentColumn = currentPosition.getColumn();
 
@@ -280,7 +290,7 @@ public class ChessMovesCalculator {
             int nextRow = currentRow + relativePositions[i][0];
             int nextCol = currentColumn + relativePositions[i][1];
             ChessPosition nextPosition = new ChessPosition(nextRow,nextCol);
-            ChessGame.TeamColor nextStatus = isSquareValid(board,nextPosition,pieceColor);
+            TeamColor nextStatus = isSquareValid(board,nextPosition,pieceColor);
             if(nextStatus != pieceColor) {
                 allPossibleMoves.add(new ChessMove(currentPosition, nextPosition, null));
             }

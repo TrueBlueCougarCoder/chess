@@ -1,4 +1,6 @@
 package chess;
+import chess.ChessPiece.PieceType;
+import chess.ChessGame.TeamColor;
 
 /**
  * A chessboard that can hold and rearrange chess pieces.
@@ -38,6 +40,64 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        throw new RuntimeException("Not implemented");
+        ChessPiece whitePiece;
+        ChessPiece blackPiece;
+
+        PieceType[] pieceTypes = {PieceType.KING, PieceType.QUEEN, PieceType.BISHOP, PieceType.KNIGHT, PieceType.ROOK};
+        int[][] piecePositions = {{4}, {3}, {2,5}, {1,6}, {0,7}};
+
+        //Sets all pieces except PAWNs
+        for(int i = 0; i < pieceTypes.length; i++) {
+            int[] positionSet = piecePositions[i];
+            PieceType currentPieceType = pieceTypes[i];
+
+            whitePiece = new ChessPiece(TeamColor.WHITE, pieceTypes[i]);
+            blackPiece = new ChessPiece(TeamColor.BLACK, pieceTypes[i]);
+            for(int position : positionSet) {
+                squares[1][position] = whitePiece;
+                squares[6][position] = blackPiece;
+            }
+        }
+
+        //Set PAWNs
+        whitePiece = new ChessPiece(TeamColor.WHITE,PieceType.PAWN);
+        blackPiece = new ChessPiece(TeamColor.BLACK,PieceType.PAWN);
+        for(int i = 0; i <=7; i++) {
+            squares[1][i] = whitePiece;
+            squares[6][i] = blackPiece;
+        }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == null) {
+            return false;
+        }
+
+        if(obj == this) {
+            return true;
+        }
+
+        if(obj.getClass() != this.getClass()) {
+            return false;
+        }
+
+        ChessBoard objBoard = (ChessBoard)obj;
+        for(int i = 0; i <= 7; i++) {
+            for(int j = 0; j <=7; j++) {
+                ChessPosition position = new ChessPosition(i+1,j+1);
+                //if(this.getPiece(position) != objBoard.getPiece(position)) {
+                ChessPiece thisPiece = this.getPiece(position);
+                ChessPiece objPiece = objBoard.getPiece(position);
+                if((thisPiece == null)) {
+                    if(thisPiece != objPiece){
+                        return false;
+                    }
+                } else if(!thisPiece.equals(objPiece)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }
